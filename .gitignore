@@ -1,0 +1,53 @@
+# Real config (may contain local paths or legacy plaintext keys)
+studio_config.json
+.codebuddy/
+.screenshots/
+*.exe
+promo-film/
+promo-studio/
+promo-video/
+
+# 运行状态、索引、缓存、临时脚本、日志
+studio_state/
+logs/
+.cache/
+data/.mm_cache/
+*.log
+
+# 用户数据与训练产物
+data/
+models/
+outputs/
+
+# 实验/开发临时文件
+build/
+dist/
+*.spec
+_probe*
+_look*
+_px.txt
+_smoke.*
+_stills.txt
+_mont.txt
+_osizes.txt
+py_check.txt
+
+# Python
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Secrets (never commit)
+*.pem
+*.key
+.env
+.env.*
+secrets/
+
+# Local acceptance artifacts
+i18n-untranslated.json
+*.zip

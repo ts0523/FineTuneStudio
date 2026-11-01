@@ -1,0 +1,20 @@
+# 微调环境依赖（Python 3.12 / Windows / CPU）
+# 安装：.venv\Scripts\python.exe -m pip install -r requirements.txt
+# 说明：torchvision 是多模态视觉编码器（MobileNetV3）需要的；装它会带 torch 一起升级，
+#      本机实测 torch 2.15.0+cpu + torchvision 0.29.2+cpu + transformers 4.57.6 训练/推理正常。
+#      当前可用组合已固化到 constraints.txt（由本机 .venv 的 pip freeze 生成）。
+torch>=2.8
+torchvision>=0.20
+transformers>=4.45,<5
+peft>=0.13
+datasets>=2.20
+accelerate>=0.34
+safetensors>=0.4
+huggingface_hub>=0.26
+numpy>=1.26
+pillow>=10
+psutil>=5.9
+sounddevice>=0.5
+opencv-python-headless>=4.8
+requests>=2.31
+tqdm

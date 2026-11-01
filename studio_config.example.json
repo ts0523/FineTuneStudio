@@ -1,0 +1,51 @@
+{
+  "_comment": "无密钥配置示例。复制为 studio_config.json 后按需修改；不要把真实 Key 写进任何配置文件。",
+  "endpoint": "https://hf-mirror.com",
+  "python": "",
+  "root": "",
+  "threads": 0,
+  "theme": "forest",
+  "theme_custom": {},
+  "ui.lang": "en",
+  "recycle_delete": true,
+  "log_lines": 3000,
+  "auto_check_env": true,
+  "ai": {
+    "key": "",
+    "_key_note": "Key 请用环境变量 FTS_AI_KEY 或应用设置页保存（Windows DPAPI），此字段永远留空",
+    "base_url": "https://openrouter.ai/api/v1",
+    "model": "",
+    "fallbacks": [],
+    "temperature": 0.6,
+    "max_tokens": 1200,
+    "timeout": 60
+  },
+  "autotrain": {
+    "goal": "",
+    "rounds": 3,
+    "per_round": 40,
+    "eval_n": 6,
+    "use_web": true
+  },
+  "chat": {
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "max_new_tokens": 128,
+    "repetition_penalty": 1.1
+  },
+  "train": {
+    "epochs": 3.0,
+    "batch_size": 2,
+    "grad_accum": 2,
+    "lr": 0.0002,
+    "max_len": 256,
+    "lora_r": 16,
+    "lora_alpha": 32,
+    "lora_dropout": 0.05,
+    "val_ratio": 0.1,
+    "seed": 42,
+    "full": false
+  },
+  "window": {"w": 1400, "h": 880},
+  "last": {"model": "", "dataset": ""}
+}

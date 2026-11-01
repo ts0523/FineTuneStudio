@@ -522,5 +522,14 @@
  "默认「白色森林」；点色卡立即切换": "White Forest is the default; click a swatch to switch immediately",
  "默认走 hf-mirror 镜像；中断后重新点下载会自动续传": "Uses hf-mirror by default; click Download again after an interruption to resume",
  "默认跳过所有 *.py；MiniMind-O 是内置可信例外（代码哈希固定）。权重 SHA-256 校验通过不代表仓库代码可信。": "Skips all *.py by default; MiniMind-O is the built-in trusted exception with pinned hashes. Weight SHA-256 does not prove repository code is trustworthy.",
- "默认，白底 + 森林绿，护眼、长": "Default white background with forest green, easy on the eyes and suitable for long sessions"
+ "默认，白底 + 森林绿，护眼、长": "Default white background with forest green, easy on the eyes and suitable for long sessions",
+ "文本适配器": "Text adapter",
+ "图像适配器": "Image adapter",
+ "音频适配器": "Audio adapter",
+ "语音适配器": "Speech adapter",
+ "云端全模态（免费）": "Cloud omni (free)",
+ "本地勾选适配器即可全模态：看图、听声、朗读；云端不需要本地环境": "Pick adapters for local omni: see images, hear audio, read aloud; cloud needs no local setup",
+ "先勾选内置适配器「图像适配器」": "Enable the built-in Image adapter first",
+ "先勾选内置适配器「音频适配器」": "Enable the built-in Audio adapter first",
+ "本地看图需要选中一个「图像适配器」（含图像投影层），或切换到云端全模态": "Local image input needs an adapter with an image projector, or switch to Cloud omni"
 }

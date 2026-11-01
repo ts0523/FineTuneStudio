@@ -12,6 +12,7 @@ from ...core import adapters
 from ...core import ai, audio, voice
 from ...core import models as models_mod
 from ...core import paths
+from .. import i18n
 from ..base import Page
 from ..theme import P, font
 from ..widgets import Badge, Card, Check, Entry, RBtn, ScrollFrame, TextArea
@@ -69,9 +70,11 @@ class ChatPage(Page):
         row3 = tk.Frame(tb, bg=P["panel"])
         row3.pack(fill="x", pady=(8, 0))
         tk.Label(row3, text="引擎", bg=P["panel"], fg=P["muted"], font=font(9)).pack(side="left")
-        self.var_engine = tk.StringVar(value=CLOUD if ai.enabled() else LOCAL)
+        # 实验层默认本地模型：直接在应用里选适配器就能全模态输入输出。
+        self._engine_labels = {i18n.tr(CLOUD): CLOUD, i18n.tr(LOCAL): LOCAL}
+        self.var_engine = tk.StringVar(value=i18n.tr(LOCAL))
         self.cb_engine = ttk.Combobox(row3, textvariable=self.var_engine, state="readonly",
-                                      values=[CLOUD, LOCAL], font=font(9), width=18)
+                                      values=list(self._engine_labels), font=font(9), width=18)
         self.cb_engine.pack(side="left", padx=(6, 14), ipady=2)
         self.cb_engine.bind("<<ComboboxSelected>>", lambda e: self._engine_changed())
         self.var_cap_text = tk.BooleanVar(value=True)
@@ -80,16 +83,16 @@ class ChatPage(Page):
         self.var_speak = tk.BooleanVar(value=bool(self.cfg.get("chat.speak", True)))
         tk.Label(row3, text="内置适配器", bg=P["panel"], fg=P["muted"],
                  font=font(9)).pack(side="left")
-        tk.Checkbutton(row3, text="语言理解", variable=self.var_cap_text, state="disabled",
-                       bg=P["panel"], fg=P["text2"], selectcolor=P["panel2"],
+        tk.Checkbutton(row3, text=adapters.adapter_label("text"), variable=self.var_cap_text,
+                       state="disabled", bg=P["panel"], fg=P["text2"], selectcolor=P["panel2"],
                        activebackground=P["panel"], font=font(8)).pack(side="left", padx=(6, 0))
-        for text, var in (("图像理解", self.var_cap_image),
-                          ("语音理解", self.var_cap_audio),
-                          ("语音输出", self.var_speak)):
-            tk.Checkbutton(row3, text=text, variable=var, bg=P["panel"], fg=P["text2"],
-                           selectcolor=P["panel2"], activebackground=P["panel"],
-                           font=font(8)).pack(side="left", padx=(6, 0))
-        tk.Label(row3, text="云端不需要本地环境；本地多选适配器会同时激活 LoRA 与投影层",
+        for key, var in (("image", self.var_cap_image),
+                         ("audio", self.var_cap_audio),
+                         ("speech", self.var_speak)):
+            tk.Checkbutton(row3, text=adapters.adapter_label(key), variable=var,
+                           bg=P["panel"], fg=P["text2"], selectcolor=P["panel2"],
+                           activebackground=P["panel"], font=font(8)).pack(side="left", padx=(6, 0))
+        tk.Label(row3, text="本地勾选适配器即可全模态：看图、听声、朗读；云端不需要本地环境",
                  bg=P["panel"], fg=P["muted"], font=font(8)).pack(side="left", padx=12)
 
         self.var_temp = tk.DoubleVar(value=float(self.cfg.get("chat.temperature", 0.7)))
@@ -181,6 +184,11 @@ class ChatPage(Page):
     # ------------------------------------------------------------ 列表
     def on_show(self) -> None:
         self._reload()
+        engine = self.app.shared.pop("chat_engine", None)
+        if engine in self._engine_labels.values():
+            # 默认本地模型；只有「先用云端模式」这类入口才显式切到云端。
+            self.var_engine.set(i18n.tr(engine))
+            self._engine_changed()
         sel = self.app.shared.pop("chat_selection", None)
         if sel:
             if sel.get("model"):
@@ -205,7 +213,8 @@ class ChatPage(Page):
         for name in self._adapter_items:
             hit = next((m for m in outs if m.name == name), None)
             mods = adapters.adapter_modalities(hit.path) if hit and hit.kind == "adapter" else []
-            suffix = f" [{'/'.join(mods)}]" if mods else ""
+            labels = [i18n.tr(adapters.adapter_label(m)) for m in mods]
+            suffix = f" · {' + '.join(labels)}" if labels else ""
             self.adapter_list.insert("end", name + suffix)
         for i, name in enumerate(self._adapter_items):
             if name in chosen:
@@ -309,7 +318,7 @@ class ChatPage(Page):
         from tkinter import filedialog
 
         if not self.var_cap_image.get():
-            self.toast("先勾选内置适配器「图像理解」", "warn")
+            self.toast("先勾选内置适配器「图像适配器」", "warn")
             return
         p = filedialog.askopenfilename(
             title="选择图片", filetypes=[("图片", "*.png *.jpg *.jpeg *.bmp *.webp")])
@@ -321,13 +330,13 @@ class ChatPage(Page):
                 "image" in adapters.adapter_modalities(str(o.path))
                 for o in models_mod.scan_outputs()
                 if o.name in self._selected_adapters()):
-            self.toast("本地看图需要选中一个含图像投影层的适配器，或切换到云端全模态", "warn", 4600)
+            self.toast("本地看图需要选中一个「图像适配器」（含图像投影层），或切换到云端全模态", "warn", 4600)
 
     def _pick_audio(self) -> None:
         from tkinter import filedialog
 
         if not self.var_cap_audio.get():
-            self.toast("先勾选内置适配器「语音理解」", "warn")
+            self.toast("先勾选内置适配器「音频适配器」", "warn")
             return
         p = filedialog.askopenfilename(title="选择语音", filetypes=[("WAV 音频", "*.wav")])
         if not p:
@@ -336,9 +345,9 @@ class ChatPage(Page):
         self._update_media()
 
     def _record_audio(self) -> None:
-        """直接录 4 秒作为语音理解输入，不转文字。"""
+        """直接录 4 秒作为音频适配器输入，不转文字。"""
         if not self.var_cap_audio.get():
-            self.toast("先勾选内置适配器「语音理解」", "warn")
+            self.toast("先勾选内置适配器「音频适配器」", "warn")
             return
         ok, err = audio.mic_available()
         if not ok:
@@ -486,7 +495,7 @@ class ChatPage(Page):
 
     # ------------------------------------------------------------ 云端引擎
     def _cloud(self) -> bool:
-        return self.var_engine.get() == CLOUD
+        return self._engine_labels.get(self.var_engine.get(), self.var_engine.get()) == CLOUD
 
     def _engine_changed(self) -> None:
         cloud = self._cloud()

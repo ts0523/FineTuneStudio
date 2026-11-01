@@ -337,6 +337,13 @@ class App(tk.Tk):
     def current_page(self):
         return self._pages.get(self._current)
 
+    def goto_cloud_chat(self) -> None:
+        """没装本地环境也能体验：进实验层并显式切到云端全模态。"""
+        from .ui.pages.chat import CLOUD
+
+        self.shared["chat_engine"] = CLOUD
+        self.goto("chat")
+
     # ---------------------------------------------------------------- 服务
     def python(self, notify: bool = True) -> Path | None:
         if self.env and self.env.python:
@@ -443,7 +450,7 @@ class App(tk.Tk):
         row = tk.Frame(wrap, bg=P["panel"])
         row.pack(fill="x")
         RBtn(row, "以后再说", dlg.destroy, kind="ghost", height=34, padx=14).pack(side="right")
-        RBtn(row, "先用云端模式", lambda: (dlg.destroy(), self.goto("chat")),
+        RBtn(row, "先用云端模式", lambda: (dlg.destroy(), self.goto_cloud_chat()),
              kind="secondary", height=34, padx=14).pack(side="right", padx=8)
         RBtn(row, "一键安装环境", lambda: (dlg.destroy(), self.bootstrap_env()),
              kind="primary", height=34, padx=16).pack(side="right")

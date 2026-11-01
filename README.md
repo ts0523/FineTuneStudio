@@ -43,6 +43,7 @@ Most fine-tuning demos stop at a Python script. FineTune Studio packages the who
 - Audio path: Whisper-tiny encoder → projector → LLM embedding injection.
 - Speech output: local Windows TTS; no cloud speech service required.
 - Multi-adapter selection: multiple LoRA adapters can be active together. Vision and audio projectors are combined from all selected adapters.
+- The chat page defaults to the local model; adapters are listed as **Image adapter / Audio adapter / Speech adapter**, so full-modality input and output is one checkbox away.
 - A single message can contain both an image and an audio clip.
 - Chat and Training pages support microphone recording and speech-to-text.
 

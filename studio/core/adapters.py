@@ -23,13 +23,26 @@ class Capability:
 
 
 BUILTIN_CAPABILITIES: tuple[Capability, ...] = (
-    Capability("text", "语言理解", "输入", "文本主干，理解中文问题与上下文"),
-    Capability("image", "图像理解", "输入", "MobileNetV3-Small 视觉编码 + 投影层"),
-    Capability("audio", "语音理解", "输入", "Whisper-tiny 语音编码 + 投影层"),
-    Capability("speech", "语音输出", "输出", "系统 TTS 把回答读出来"),
+    Capability("text", "文本适配器", "输入", "文本主干，理解中文问题与上下文"),
+    Capability("image", "图像适配器", "输入", "MobileNetV3-Small 视觉编码 + 投影层"),
+    Capability("audio", "音频适配器", "输入", "Whisper-tiny 语音编码 + 投影层"),
+    Capability("speech", "语音适配器", "输出", "系统 TTS 把回答读出来"),
 )
 
 DEFAULT_CAPABILITIES = tuple(c.key for c in BUILTIN_CAPABILITIES if c.default)
+
+# 界面上一律用「××适配器」称呼，选了哪个就等于开了哪条模态通路。
+ADAPTER_NAMES: dict[str, str] = {c.key: c.title for c in BUILTIN_CAPABILITIES}
+
+
+def adapter_label(key: str) -> str:
+    """模态键 → 适配器名（图像适配器 / 音频适配器 / …）。"""
+    return ADAPTER_NAMES.get(str(key), str(key))
+
+
+def adapter_labels(keys) -> str:
+    """多模态键列表 → 「图像适配器 + 音频适配器」。"""
+    return " + ".join(adapter_label(k) for k in keys)
 
 
 def capability(key: str) -> Capability | None:
